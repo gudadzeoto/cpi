@@ -25,7 +25,7 @@ function App() {
             <Main language={language} setLanguage={setLanguage} />
           </div>
         </div>
-        <Footer></Footer>
+        <Footer language={language} setLanguage={setLanguage}></Footer>
       </div>
 
     </ErrorBoundary>
