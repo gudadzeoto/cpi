@@ -21,7 +21,6 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
   const [amount, setAmount] = useState("100");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef(null);
-  const [menuState, setMenuState] = useState({ visible: false, x: 0, y: 0 });
 
   useEffect(() => {
     calculateIndex();
@@ -56,6 +55,7 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
     "November",
     "December",
   ];
+
   const months = language === "GE" ? monthsGE : monthsEN;
 
   const years = Array.from({ length: 2025 - 1988 + 1 }, (_, i) => 2025 - i);
@@ -71,10 +71,13 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
     return true;
   };
 
+  const [calculatedValue, setCalculatedValue] = useState(null);
+
   const computedAmount = () => {
     const numericAmount = parseFloat(amount);
-    if (isNaN(numericAmount)) return 0;
-    return (numericAmount * 1.0556).toFixed(2);
+    if (isNaN(numericAmount) || calculatedValue === null) return 0;
+    const multiplier = 1 + parseFloat(calculatedValue) / 100;
+    return (numericAmount * multiplier).toFixed(2);
   };
 
   async function calculateIndex() {
@@ -86,21 +89,117 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
     const index_start_date = start_date.data[0].Index;
     const index_end_date = end_date.data[0].Index;
 
-    var calculated = ((index_end_date / index_start_date) * 100 - 100).toFixed(
-      2
-    );
+    const calculated = (
+      (index_end_date / index_start_date) * 100 -
+      100
+    ).toFixed(2);
+    setCalculatedValue(calculated);
   }
+
+  // ფუნქცია თვეების სწორად "თან" ფორმატირებისთვის ქართულად
+  const monthsWithTan = (month) => {
+    const m = parseInt(month, 10);
+    if (m < 1 || m > 12) return "";
+    switch (m) {
+      case 1:
+        return "იანვართან";
+      case 2:
+        return "თებერვალთან";
+      case 3:
+        return "მარტთან";
+      case 4:
+        return "აპრილთან";
+      case 5:
+        return "მაისთან";
+      case 6:
+        return "ივნისთან";
+      case 7:
+        return "ივლისთან";
+      case 8:
+        return "აგვისტოსთან";
+      case 9:
+        return "სექტემბერთან";
+      case 10:
+        return "ოქტომბერთან";
+      case 11:
+        return "ნოემბერთან";
+      case 12:
+        return "დეკემბერთან";
+      default:
+        return "";
+    }
+  };
+
+  const monthsWithShi = (month) => {
+    const m = parseInt(month, 10);
+    if (m < 1 || m > 12) return "";
+    switch (m) {
+      case 1:
+        return "იანვარში";
+      case 2:
+        return "თებერვალში";
+      case 3:
+        return "მარტში";
+      case 4:
+        return "აპრილში";
+      case 5:
+        return "მაისში";
+      case 6:
+        return "ივნისში";
+      case 7:
+        return "ივლისში";
+      case 8:
+        return "აგვისტოში";
+      case 9:
+        return "სექტემბერში";
+      case 10:
+        return "ოქტომბერში";
+      case 11:
+        return "ნოემბერში";
+      case 12:
+        return "დეკემბერში";
+      default:
+        return "";
+    }
+  };
+
+  const monthsWithIs = (month) => {
+    const m = parseInt(month, 10);
+    if (m < 1 || m > 12) return "";
+    switch (m) {
+      case 1:
+        return "იანვარის";
+      case 2:
+        return "თებერვლის";
+      case 3:
+        return "მარტის";
+      case 4:
+        return "აპრილის";
+      case 5:
+        return "მაისის";
+      case 6:
+        return "ივნისის";
+      case 7:
+        return "ივლისის";
+      case 8:
+        return "აგვისტოს";
+      case 9:
+        return "სექტემბრის";
+      case 10:
+        return "ოქტომბრის";
+      case 11:
+        return "ნოემბერის";
+      case 12:
+        return "დეკემბერის";
+      default:
+        return "";
+    }
+  };
 
   // Highcharts options
   const chartOptions = {
-    chart: {
-      backgroundColor: "transparent",
-    },
-
-    credits: {
-      enabled: false,
-    },
-
+    chart: { backgroundColor: "transparent" },
+    credits: { enabled: false },
     title: {
       text:
         language === "GE"
@@ -112,69 +211,13 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
         color: "#333333",
       },
     },
-
-    accessibility: {
-      point: {
-        valueDescriptionFormat: "{xDescription}{separator}{value} million(s)",
-      },
-    },
-
     xAxis: {
-      title: {
-        text: "",
-        style: {
-          fontSize: "15px",
-          fontFamily: "bpg_mrgvlovani_caps",
-          color: "#333333",
-        },
-      },
+      title: { text: "" },
       categories: [1995, 2000, 2005, 2010, 2015, 2020, 2023],
-      labels: {
-        style: {
-          fontSize: "11px",
-          fontFamily: "bpg_mrgvlovani_caps",
-          color: "#333333",
-        },
-      },
     },
-
     yAxis: {
-      type: "logarithmic",
-      title: {
-        text: language === "GE" ? "პროცენტი (%)" : "Percent (%)",
-        style: {
-          fontSize: "12px",
-          fontFamily: "bpg_mrgvlovani_caps",
-          color: "#333333",
-        },
-      },
-      labels: {
-        style: {
-          fontSize: "11px",
-          fontFamily: "bpg_mrgvlovani_caps",
-          color: "#333333",
-        },
-      },
+      title: { text: language === "GE" ? "პროცენტი (%)" : "Percent (%)" },
     },
-
-    tooltip: {
-      headerFormat: "{series.name}: ",
-      pointFormat: "<b>{point.y}%</b>",
-      style: {
-        fontSize: "11px",
-        fontFamily: "bpg_mrgvlovani_caps",
-        color: "#333333",
-      },
-    },
-
-    legend: {
-      itemStyle: {
-        fontSize: "15px",
-        fontFamily: "bpg_mrgvlovani_caps",
-        color: "#333333",
-      },
-    },
-
     series: [
       {
         name:
@@ -195,7 +238,6 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
       <div className="flex flex-col md:flex-row gap-6 p-6">
         {/* Left Side */}
         <div className="flex-1 flex flex-col gap-4">
-          {/* Header */}
           <div className="w-full bg-gray-100 rounded-md py-2 mb-4 flex justify-center">
             <h3 className="md:text-base font-semibold text-[#003366]">
               {language === "GE" ? "დროის პერიოდი" : "Time period"}
@@ -301,16 +343,19 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
               </p>
               <p className="mb-2">
                 სამომხმარებლო ფასების ინდექსის ცვლილებამ {endYear} წლის{" "}
-                {months[endMonth - 1]}ში {startYear} წლის{" "}
-                {months[startMonth - 1]}თან შედარებით შეადგინა 5.56 %.
+                {monthsWithShi(endMonth)} {startYear} წლის{" "}
+                {monthsWithTan(startMonth)} შედარებით შეადგინა{" "}
+                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                  {calculatedValue}%.
+                </span>
               </p>
               <p className="mb-2">
-                {amount} ლარი {months[startMonth - 1]}ს {startYear} წლის
-                მდგომარეობით, ინფლაციის გათვალისწინებით, {months[endMonth - 1]}ს{" "}
-                {endYear} წელს შეადგენს {computedAmount()} ლარს.
+                {startYear} წლის {monthsWithIs(startMonth)} <span style={{ fontWeight: "bold", color: "#01389c" }}>{amount}</span> ლარი ლარის
+                ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>{computedAmount()}</span> ლარს.
               </p>
               <p className="text-gray-500 text-xs">
-                {" "}
                 {language === "GE"
                   ? "შენიშვნა: საბოლოო პერიოდი მონაწილეობს გაანგარიშებაში."
                   : "Note: the end period participates in calculation."}
@@ -318,7 +363,6 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
             </>
           ) : (
             <p>
-              {" "}
               {language === "GE"
                 ? "აირჩიეთ დროის პერიოდები და თანხა შედეგის სანახავად."
                 : "Select time periods and amount to see results."}
@@ -338,9 +382,8 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
             {language === "GE"
               ? "გაანგარიშების ინსტრუქცია"
               : "Calculation instruction"}
-          </span>{" "}
+          </span>
           <span>
-            {" "}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 sm:h-6 sm:w-6"
@@ -359,7 +402,6 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
         </button>
       </div>
 
-      {/* Highcharts — Instruction ქვემოთ */}
       <div>
         <HighchartsReact
           highcharts={Highcharts}
