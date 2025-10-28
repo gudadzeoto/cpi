@@ -5,6 +5,7 @@ import exportDataInit from "highcharts/modules/export-data";
 import HighchartsReact from "highcharts-react-official";
 import InfoModal from "./InfoModal";
 import api from "../api";
+import SoundManager from "./SoundManager";
 
 try {
   exportingInit(Highcharts);
@@ -44,7 +45,11 @@ const monthsEN = [
   "December",
 ];
 
-const Main = ({ language = "GE" }) => {
+const Main = ({
+  language = "GE",
+  setLanguage = () => {},
+  soundEnabled = false,
+}) => {
   const [startYear, setStartYear] = useState("");
   const [startMonth, setStartMonth] = useState("");
   const [endYear, setEndYear] = useState("");
@@ -52,8 +57,7 @@ const Main = ({ language = "GE" }) => {
   const [amount, setAmount] = useState("100");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef(null);
-  const [chartCategories, setChartCategories] = useState([2024, 2025,
-  ]);
+  const [chartCategories, setChartCategories] = useState([2024, 2025]);
   const [chartData, setChartData] = useState([0, 0]);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
 
@@ -143,7 +147,7 @@ const Main = ({ language = "GE" }) => {
     });
     setChartData(dynamicData);
     setIsLoadingChart(false);
-  }, [startYear, startMonth, endYear, endMonth, language]);
+  }, [startYear, startMonth, endYear, endMonth, months]);
 
   useEffect(() => {
     calculateIndex();
@@ -220,7 +224,7 @@ const Main = ({ language = "GE" }) => {
     if (m < 1 || m > 12) return "";
     switch (m) {
       case 1:
-        return "იანვარის";
+        return "იანვრის";
       case 2:
         return "თებერვლის";
       case 3:
@@ -337,6 +341,7 @@ const Main = ({ language = "GE" }) => {
             </label>
             <select
               value={startYear}
+              id="startYearSlct"
               onChange={(e) => setStartYear(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
             >
@@ -351,6 +356,7 @@ const Main = ({ language = "GE" }) => {
             </select>
             <select
               value={startMonth}
+              id="startMonthSlct"
               onChange={(e) => setStartMonth(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
             >
@@ -372,6 +378,7 @@ const Main = ({ language = "GE" }) => {
             </label>
             <select
               value={endYear}
+              id="endYearSlct"
               onChange={(e) => setEndYear(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
             >
@@ -386,6 +393,7 @@ const Main = ({ language = "GE" }) => {
             </select>
             <select
               value={endMonth}
+              id="endMonthSlct"
               onChange={(e) => setEndMonth(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
             >
@@ -406,6 +414,7 @@ const Main = ({ language = "GE" }) => {
               {language === "GE" ? "თანხა:" : "Amount:"}
             </label>
             <input
+              id="amountSlct"
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -423,11 +432,31 @@ const Main = ({ language = "GE" }) => {
                 : "The end period is less than the beginning period."}
             </p>
           ) : startYear && startMonth && endYear && endMonth && amount ? (
-            <>
+            <div role="status" aria-live="polite" aria-atomic="true">
               <p className="mb-2 font-semibold text-center">
                 {language === "GE" ? "შედეგი:" : "Result:"}
               </p>
-              <p className="mb-2">
+              {/* RESULT TEXT */}
+              <p
+                className="mb-2"
+                id="resultText"
+                tabIndex={0}
+                onClick={() => {
+                  const text =
+                    language === "GE"
+                      ? `სამომხმარებლო ფასების ინდექსის ცვლილებამ ${endYear} წლის ${monthsWithShi(
+                          endMonth
+                        )}, ${startYear} წლის ${monthsWithTan(
+                          startMonth
+                        )} შედარებით შეადგინა ${calculatedValue} პროცენტი.`
+                      : `Consumer Price Index change from ${
+                          monthsEN[startMonth - 1]
+                        } ${startYear} to ${
+                          monthsEN[endMonth - 1]
+                        } ${endYear} is ${calculatedValue} percent.`;
+                  if (window.playText) window.playText(text);
+                }}
+              >
                 სამომხმარებლო ფასების ინდექსის ცვლილებამ {endYear} წლის{" "}
                 {monthsWithShi(endMonth)} {startYear} წლის{" "}
                 {monthsWithTan(startMonth)} შედარებით შეადგინა{" "}
@@ -435,7 +464,27 @@ const Main = ({ language = "GE" }) => {
                   {calculatedValue}%.
                 </span>
               </p>
-              <p className="mb-2">
+              {/* AMOUNT RESULT */}
+              <p
+                className="mb-2"
+                id="resultTexts"
+                tabIndex={0}
+                onClick={() => {
+                  const text =
+                    language === "GE"
+                      ? `${startYear} წლის ${monthsWithIs(
+                          startMonth
+                        )} ${amount} ლარი ლარის ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
+                          endMonth
+                        )} მდგომარეობით შეადგენს ${computedAmount()} ლარს.`
+                      : `${amount} lari in ${
+                          monthsEN[startMonth - 1]
+                        } ${startYear}, adjusted for inflation, equals ${computedAmount()} lari as of ${
+                          monthsEN[endMonth - 1]
+                        } ${endYear}.`;
+                  if (window.playText) window.playText(text);
+                }}
+              >
                 {startYear} წლის {monthsWithIs(startMonth)}{" "}
                 <span style={{ fontWeight: "bold", color: "#01389c" }}>
                   {amount}
@@ -447,12 +496,25 @@ const Main = ({ language = "GE" }) => {
                 </span>{" "}
                 ლარს.
               </p>
-              <p className="text-gray-500 text-xs">
+
+              {/* NOTE TEXT */}
+              <p
+                className="text-gray-500 text-xs"
+                id="Note"
+                tabIndex={0}
+                onClick={() => {
+                  const text =
+                    language === "GE"
+                      ? "შენიშვნა: საბოლოო პერიოდი მონაწილეობს გაანგარიშებაში."
+                      : "Note: the end period participates in calculation.";
+                  if (window.playText) window.playText(text);
+                }}
+              >
                 {language === "GE"
                   ? "შენიშვნა: საბოლოო პერიოდი მონაწილეობს გაანგარიშებაში."
                   : "Note: the end period participates in calculation."}
               </p>
-            </>
+            </div>
           ) : (
             <p>
               {language === "GE"
@@ -526,6 +588,19 @@ const Main = ({ language = "GE" }) => {
           language={language}
         />
       )}
+      {/* Mount SoundManager here so it has access to Main's state and helper functions */}
+      <SoundManager
+        soundEnabled={soundEnabled}
+        language={language}
+        startYear={startYear}
+        startMonth={startMonth}
+        endYear={endYear}
+        endMonth={endMonth}
+        calculatedValue={calculatedValue}
+        amount={amount}
+        monthsWithShi={monthsWithShi}
+        monthsWithTan={monthsWithTan}
+      />
     </section>
   );
 };

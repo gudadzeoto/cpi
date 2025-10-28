@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import sakstatLogoGe from "../assets/images/sakstat-logo.svg";
 import sakstatLogoEn from "../assets/images/sakstat-logo-en.png";
@@ -11,9 +11,12 @@ import font from "../assets/images/font.png";
 import dark from "../assets/images/dark-mode.png";
 import info from "../assets/images/info.png";
 
-const Header = ({ language = "GE", setLanguage = () => {} }) => {
-  // start with audio OFF 🔇
-  const [isAudioOn, setIsAudioOn] = useState(false);
+const Header = ({
+  language = "GE",
+  setLanguage = () => {},
+  soundEnabled = false,
+  setSoundEnabled = () => {},
+}) => {
   const fontClass =
     language === "GE" ? "bpg_mrgvlovani_caps" : "bpg_mrgvlovani_caps";
 
@@ -22,7 +25,35 @@ const Header = ({ language = "GE", setLanguage = () => {} }) => {
   };
 
   const toggleAudio = () => {
-    setIsAudioOn((prev) => !prev);
+    const newValue = !soundEnabled;
+    setSoundEnabled(newValue);
+
+    // Directly play TTS on user gesture
+    const message = newValue
+      ? language === "GE"
+        ? "აუდიო გახმოვანების ჩართვა"
+        : "Turn on audio playback"
+      : language === "GE"
+      ? "აუდიო გახმოვანების გამორთვა"
+      : "Turn off audio playback";
+
+    if (message) {
+      const langParam = language === "GE" ? "ka" : "en";
+      const url = `http://localhost:5000/api/tts?text=${encodeURIComponent(
+        message
+      )}&lang=${langParam}`;
+
+      // Stop previous audio if any
+      if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio.currentTime = 0;
+      }
+
+      const audio = new Audio(url);
+      audio.volume = 0.4;
+      audio.play().catch(() => {}); // catch if blocked
+      window.currentAudio = audio;
+    }
   };
 
   return (
@@ -48,7 +79,11 @@ const Header = ({ language = "GE", setLanguage = () => {} }) => {
         </div>
 
         {/* Title */}
-        <h1 className="text-center text-white text-[20px] bpg_mrgvlovani_caps">
+        <h1
+          className="text-center text-white text-[20px] bpg_mrgvlovani_caps"
+          id="titletext"
+          tabIndex={0}
+        >
           {language === "GE"
             ? "სამომხმარებლო ფასების ინდექსის კალკულატორი"
             : "Consumer Price Index Calculator"}
@@ -59,10 +94,15 @@ const Header = ({ language = "GE", setLanguage = () => {} }) => {
           {/* Top icons */}
           <div className="flex items-center justify-end gap-2 p-0 leading-[0] mt-[10px] mr-[38px]">
             <img
-              src={isAudioOn ? audioon : audiooff}
+              src={soundEnabled ? audioon : audiooff}
+              id="sounds"
+              tabIndex={0}
+              role="button"
               alt="audio"
               onClick={toggleAudio}
-              className="w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110"
+              className={`w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110 ${
+                soundEnabled ? "sound-on" : ""
+              }`}
             />
             <img
               src={font}
