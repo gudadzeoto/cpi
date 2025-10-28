@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Highcharts from "highcharts";
 import exportingInit from "highcharts/modules/exporting";
 import exportDataInit from "highcharts/modules/export-data";
@@ -13,7 +13,38 @@ try {
   void e;
 }
 
-const Main = ({ language = "GE", setLanguage = () => {} }) => {
+// Month labels declared at module scope so their identity is stable across renders
+const monthsGE = [
+  "იანვარი",
+  "თებერვალი",
+  "მარტი",
+  "აპრილი",
+  "მაისი",
+  "ივნისი",
+  "ივლისი",
+  "აგვისტო",
+  "სექტემბერი",
+  "ოქტომბერი",
+  "ნოემბერი",
+  "დეკემბერი",
+];
+
+const monthsEN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const Main = ({ language = "GE" }) => {
   const [startYear, setStartYear] = useState("");
   const [startMonth, setStartMonth] = useState("");
   const [endYear, setEndYear] = useState("");
@@ -21,40 +52,10 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
   const [amount, setAmount] = useState("100");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef(null);
-
-  useEffect(() => {
-    calculateIndex();
-  }, [startYear, startMonth, endYear, endMonth]);
-
-  const monthsGE = [
-    "იანვარი",
-    "თებერვალი",
-    "მარტი",
-    "აპრილი",
-    "მაისი",
-    "ივნისი",
-    "ივლისი",
-    "აგვისტო",
-    "სექტემბერი",
-    "ოქტომბერი",
-    "ნოემბერი",
-    "დეკემბერი",
-  ];
-
-  const monthsEN = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const [chartCategories, setChartCategories] = useState([2024, 2025,
+  ]);
+  const [chartData, setChartData] = useState([0, 0]);
+  const [isLoadingChart, setIsLoadingChart] = useState(false);
 
   const months = language === "GE" ? monthsGE : monthsEN;
 
@@ -80,8 +81,9 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
     return (numericAmount * multiplier).toFixed(2);
   };
 
-  async function calculateIndex() {
+  const calculateIndex = useCallback(async () => {
     if (!startYear || !startMonth || !endYear || !endMonth) return;
+    setIsLoadingChart(true);
 
     const start_date = await api.get(`/cpiindexes/${startYear}/${startMonth}`);
     const end_date = await api.get(`/cpiindexes/${endYear}/${endMonth}`);
@@ -94,9 +96,59 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
       100
     ).toFixed(2);
     setCalculatedValue(calculated);
-  }
 
-  // ფუნქცია თვეების სწორად "თან" ფორმატირებისთვის ქართულად
+    // Generate month-by-month interval from startYear/startMonth to endYear/endMonth
+    const startY = parseInt(startYear, 10);
+    const startM = parseInt(startMonth, 10);
+    const endY = parseInt(endYear, 10);
+    const endM = parseInt(endMonth, 10);
+    const pairs = [];
+    let cy = startY;
+    let cm = startM;
+    while (cy < endY || (cy === endY && cm <= endM)) {
+      pairs.push({ year: cy, month: cm });
+      cm += 1;
+      if (cm > 12) {
+        cm = 1;
+        cy += 1;
+      }
+    }
+
+    // Build localized category labels (e.g., "Jan 1995" or Georgian month + year)
+    const labels = pairs.map((p) => `${months[p.month - 1]} ${p.year}`);
+    setChartCategories(labels);
+
+    // Fetch CPI for each month in the interval
+    const dataPromises = pairs.map(async (p) => {
+      try {
+        const res = await api.get(`/cpiindexes/${p.year}/${p.month}`);
+        return res.data && res.data[0] ? res.data[0].Index : null;
+      } catch {
+        return null;
+      }
+    });
+
+    let indexes = [];
+    try {
+      indexes = await Promise.all(dataPromises);
+    } catch (err) {
+      // if some requests fail, fill missing with nulls
+      console.error("Failed fetching yearly CPI", err);
+    }
+
+    // Convert to % change from start; if missing, set null
+    const dynamicData = indexes.map((index) => {
+      if (index == null || index === undefined) return null;
+      return Number(((index / index_start_date) * 100 - 100).toFixed(2));
+    });
+    setChartData(dynamicData);
+    setIsLoadingChart(false);
+  }, [startYear, startMonth, endYear, endMonth, language]);
+
+  useEffect(() => {
+    calculateIndex();
+  }, [calculateIndex]);
+
   const monthsWithTan = (month) => {
     const m = parseInt(month, 10);
     if (m < 1 || m > 12) return "";
@@ -212,11 +264,36 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
       },
     },
     xAxis: {
-      title: { text: "" },
-      categories: [1995, 2000, 2005, 2010, 2015, 2020, 2023],
+      title: {
+        text: "",
+        style: {
+          fontFamily: "bpg_mrgvlovani_caps",
+          fontSize: "13px",
+          color: "#333333",
+        },
+      },
+      categories: chartCategories,
+      labels: {
+        style: {
+          fontFamily: "bpg_mrgvlovani_caps",
+          fontSize: "9px",
+          color: "#555555",
+        },
+      },
+      lineColor: "#999999",
+      lineWidth: 1,
+      tickColor: "#999999",
+      tickWidth: 1,
+      gridLineColor: "#e0e0e0",
     },
     yAxis: {
-      title: { text: language === "GE" ? "პროცენტი (%)" : "Percent (%)" },
+      title: {
+        text: language === "GE" ? "პროცენტი (%)" : "Percent (%)",
+        style: {
+          fontFamily: "bpg_mrgvlovani_caps",
+          color: "#333333",
+        },
+      },
     },
     series: [
       {
@@ -224,10 +301,19 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
           language === "GE"
             ? "სამომხმარებლო ფასების ინდექსის ცვლილება"
             : "Consumer Price Index change",
-        data: [0, 0, 0, 0, 0, 0, 0],
+        data: chartData,
         color: "var(--highcharts-color-1, #2caffe)",
+        tooltip: {
+          valueSuffix: "%",
+        },
       },
     ],
+    legend: {
+      itemStyle: {
+        fontFamily: "bpg_mrgvlovani_caps",
+        color: "#333333",
+      },
+    },
   };
 
   return (
@@ -350,10 +436,16 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
                 </span>
               </p>
               <p className="mb-2">
-                {startYear} წლის {monthsWithIs(startMonth)} <span style={{ fontWeight: "bold", color: "#01389c" }}>{amount}</span> ლარი ლარის
-                ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                  {amount}
+                </span>{" "}
+                ლარი ლარის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
                 {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
-                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>{computedAmount()}</span> ლარს.
+                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                  {computedAmount()}
+                </span>{" "}
+                ლარს.
               </p>
               <p className="text-gray-500 text-xs">
                 {language === "GE"
@@ -402,12 +494,29 @@ const Main = ({ language = "GE", setLanguage = () => {} }) => {
         </button>
       </div>
 
-      <div>
+      <div className="relative">
         <HighchartsReact
           highcharts={Highcharts}
           options={chartOptions}
           ref={chartRef}
         />
+        {isLoadingChart && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(255,255,255,0.7)",
+              zIndex: 20,
+            }}
+          >
+            <div className="text-sm font-medium text-gray-700">
+              {language === "GE" ? "ჩატვირთვა..." : "Loading..."}
+            </div>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (
