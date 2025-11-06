@@ -13,10 +13,18 @@ function App() {
 
   return (
     <ErrorBoundary language={language}>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <div className="w-full flex justify-center bg-gray-50">
+      <div
+        className="min-h-screen flex flex-col"
+        style={{ backgroundColor: "var(--app-bg)", color: "var(--app-text)" }}
+      >
+        <div className="w-full flex justify-center" style={{ backgroundColor: "var(--app-bg)" }}>
           <div className="w-full max-w-[1200px] px-4 md:px-8">
-            <Header language={language} setLanguage={setLanguage} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />
+            <Header
+              language={language}
+              setLanguage={setLanguage}
+              soundEnabled={soundEnabled}
+              setSoundEnabled={setSoundEnabled}
+            />
 
           </div>
         </div>

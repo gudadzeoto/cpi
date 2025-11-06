@@ -329,7 +329,7 @@ const Main = ({
         {/* Left Side */}
         <div className="flex-1 flex flex-col gap-4">
           <div className="w-full bg-gray-100 rounded-md py-2 mb-4 flex justify-center">
-            <h3 className="md:text-base font-semibold text-[#003366]">
+            <h3 className="md:text-base font-semibold text-[#003366] period-title">
               {language === "GE" ? "დროის პერიოდი" : "Time period"}
             </h3>
           </div>
@@ -343,7 +343,7 @@ const Main = ({
               value={startYear}
               id="startYearSlct"
               onChange={(e) => setStartYear(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ წელი" : "Select year"}
@@ -358,7 +358,7 @@ const Main = ({
               value={startMonth}
               id="startMonthSlct"
               onChange={(e) => setStartMonth(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ თვე" : "Select month"}
@@ -380,7 +380,7 @@ const Main = ({
               value={endYear}
               id="endYearSlct"
               onChange={(e) => setEndYear(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ წელი" : "Select year"}
@@ -395,7 +395,7 @@ const Main = ({
               value={endMonth}
               id="endMonthSlct"
               onChange={(e) => setEndMonth(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333]"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ თვე" : "Select month"}
@@ -410,7 +410,7 @@ const Main = ({
 
           {/* Amount */}
           <div className="flex items-center gap-7">
-            <label className="text-red-600 font-semibold w-[80px] text-sm">
+            <label className="text-red-600 font-semibold w-[80px] text-sm ">
               {language === "GE" ? "თანხა:" : "Amount:"}
             </label>
             <input
@@ -418,7 +418,7 @@ const Main = ({
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 w-[370px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-right text-[#333]"
+              className="border border-gray-300 rounded-md px-3 py-2 w-[370px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-right text-[#333] period-select "
             />
           </div>
         </div>
@@ -499,7 +499,7 @@ const Main = ({
 
               {/* NOTE TEXT */}
               <p
-                className="text-gray-500 text-xs"
+                className="text-gray-500 text-xs period-select"
                 id="Note"
                 tabIndex={0}
                 onClick={() => {

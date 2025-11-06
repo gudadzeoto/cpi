@@ -1,1 +1,80 @@
 @import "tailwindcss";
+
+:root {
+  --app-bg: #f8fafc; /* light */
+  --app-text: #111827;
+}
+
+body.dark {
+  --app-bg: #0f1724; /* dark background */
+  --app-text: #e6eef8; /* light text */
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+body.dark .bg-white,
+body.dark .bg-gray-50,
+body.dark .bg-gray-100,
+body.dark .bg-gray-200 {
+  background-color: var(--app-bg) !important;
+  color: var(--app-text) !important;
+}
+
+body.dark .text-gray-700,
+body.dark .text-gray-800,
+body.dark .text-gray-900 {
+  color: var(--app-text) !important;
+}
+
+body.dark .border-gray-300,
+body.dark .bg-white\/90 {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark .period-title {
+  color: #ffffff !important;
+}
+
+body.dark .period-select,
+body.dark .period-select option {
+  color: #ffffff !important;
+}
+
+/* Highcharts SVG text override */
+body.dark .highcharts-root text,
+body.dark .highcharts-container svg text {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+body.dark .app-footer,
+body.dark .app-footer .footer-text {
+  color: #ffffff !important;
+}
+body.dark .app-footer a {
+  color: #9ecfff !important;
+}
+
+body.dark .period-select {
+  background-color: var(--app-bg) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark .period-select option {
+  background-color: var(--app-bg) !important;
+  color: #ffffff !important;
+}
+
+body.dark .period-select {
+  -webkit-appearance: menulist-button;
+  -moz-appearance: menulist-button;
+  appearance: menulist-button;
+}
+
+body.dark .period-select::-ms-expand {
+  display: none;
+}

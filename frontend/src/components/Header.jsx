@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import sakstatLogoGe from "../assets/images/sakstat-logo.svg";
 import sakstatLogoEn from "../assets/images/sakstat-logo-en.png";
@@ -17,6 +17,31 @@ const Header = ({
   soundEnabled = false,
   setSoundEnabled = () => {},
 }) => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("darkMode");
+      const initial = stored === "true";
+      setIsDarkMode(initial);
+      if (initial) document.body.classList.add("dark");
+      else document.body.classList.remove("dark");
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, []);
+
+  const toggleDark = () => {
+    const newValue = !isDarkMode;
+    setIsDarkMode(newValue);
+    try {
+      localStorage.setItem("darkMode", newValue ? "true" : "false");
+    } catch (e) {
+      // ignore storage errors
+    }
+    if (newValue) document.body.classList.add("dark");
+    else document.body.classList.remove("dark");
+  };
   const fontClass =
     language === "GE" ? "bpg_mrgvlovani_caps" : "bpg_mrgvlovani_caps";
 
@@ -111,7 +136,15 @@ const Header = ({
             />
             <img
               src={dark}
+              id="darkModeToggle"
+              role="button"
+              aria-pressed={isDarkMode}
+              tabIndex={0}
               alt="dark"
+              onClick={toggleDark}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") toggleDark();
+              }}
               className="w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110"
             />
             <img
@@ -125,7 +158,7 @@ const Header = ({
           <div className="mr-[38px] mt-7">
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-2 bg-white/90 hover:bg-white px-4 py-2.5 rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 bg-white/90 hover:bg-white px-4 py-2.5 rounded-md transition-all duration-300 cursor-pointer period-select"
             >
               <span className="text-gray-700 text-sm md:text-base font-medium cursor-pointer">
                 {language === "GE" ? "English" : "ქართული"}

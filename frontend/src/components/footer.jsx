@@ -2,9 +2,9 @@ import React from "react";
 
 const Footer = ({ language = "GE" }) => {
   return (
-    <footer className="w-full text-center text-sm text-gray-700 py-6 mt-auto">
+    <footer className="w-full text-center text-sm text-gray-700 py-6 mt-auto app-footer">
       <div className="max-w-4xl mx-auto px-4">
-        <p className="text-xs sm:text-sm text-gray-600 leading-5 bpg_mrgvlovani_caps">
+        <p className="text-xs sm:text-sm text-gray-600 leading-5 bpg_mrgvlovani_caps footer-text">
           {language === "GE" ? "© 2025 ყველა უფლება დაცულია." : "© 2025 All rights reserved."}
           <br />
           {language === "GE"
