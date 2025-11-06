@@ -18,6 +18,31 @@ const Header = ({
   setSoundEnabled = () => {},
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [fontSizeLevel, setFontSizeLevel] = useState(0); // 0=default, 1=large, 2=larger
+
+  // Set default font size on mount and clear any stored value
+  useEffect(() => {
+    try {
+      // Clear any stored font size to ensure default on first load
+      localStorage.removeItem("fontSizeLevel");
+      setFontSizeLevel(0);
+      document.body.dataset.fontSize = '';
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, []);
+
+  // Toggle through font sizes: default -> large -> larger -> default
+  const toggleFontSize = () => {
+    const newLevel = (fontSizeLevel + 1) % 3;
+    setFontSizeLevel(newLevel);
+    document.body.dataset.fontSize = newLevel > 0 ? newLevel.toString() : '';
+    try {
+      localStorage.setItem("fontSizeLevel", newLevel.toString());
+    } catch (e) {
+      // ignore storage errors
+    }
+  };
 
   useEffect(() => {
     try {
@@ -131,8 +156,15 @@ const Header = ({
             />
             <img
               src={font}
-              alt="font"
+              alt="font size"
+              role="button"
+              tabIndex={0}
+              onClick={toggleFontSize}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") toggleFontSize();
+              }}
               className="w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110"
+              aria-label={`Toggle font size (currently ${fontSizeLevel === 0 ? 'default' : fontSizeLevel === 1 ? 'large' : 'larger'})`}
             />
             <img
               src={dark}
@@ -160,7 +192,7 @@ const Header = ({
               onClick={toggleLanguage}
               className="flex items-center gap-2 bg-white/90 hover:bg-white px-4 py-2.5 rounded-md transition-all duration-300 cursor-pointer period-select"
             >
-              <span className="text-gray-700 text-sm md:text-base font-medium cursor-pointer">
+              <span className="text-gray-700 text-sm md:text-base font-medium cursor-pointer language-toggle">
                 {language === "GE" ? "English" : "ქართული"}
               </span>
               <img
