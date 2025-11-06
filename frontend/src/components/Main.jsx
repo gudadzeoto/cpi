@@ -418,7 +418,7 @@ const Main = ({
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 w-[370px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-right text-[#333] period-select "
+              className="border border-gray-300 rounded-md px-3 py-2 w-[380px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-right text-[#333] amount-select"
             />
           </div>
         </div>

@@ -3,6 +3,12 @@
 :root {
   --app-bg: #f8fafc; /* light */
   --app-text: #111827;
+
+  --body-font-size: 14px;
+  --h1-font-size: 20px;
+  --h2-font-size: 18px;
+  --h3-font-size: 16px;
+  --small-font-size: 14px;
 }
 
 body.dark {
@@ -13,6 +19,49 @@ body.dark {
 body {
   background-color: var(--app-bg);
   color: var(--app-text);
+  font-size: var(--body-font-size);
+}
+
+body[data-font-size="1"] {
+  --body-font-size: 20px;
+  --h1-font-size: 24px;
+  --h2-font-size: 22px;
+  --h3-font-size: 20px;
+  --small-font-size: 16px;
+}
+body[data-font-size="2"] {
+  --body-font-size: 24px;
+  --h1-font-size: 28px;
+  --h2-font-size: 26px;
+  --h3-font-size: 24px;
+  --small-font-size: 18px;
+}
+
+.language-toggle {
+  font-size: 16px !important;
+}
+
+h1 { font-size: var(--h1-font-size); }
+h2 { font-size: var(--h2-font-size); }
+h3 { font-size: var(--h3-font-size); }
+.text-sm { font-size: var(--small-font-size); }
+
+input[type="text"],
+input[type="number"],
+select,
+button {
+  font-size: var(--body-font-size);
+}
+
+.period-select {
+  font-size: var(--body-font-size);
+  padding: 0.5em 2em 0.5em 0.75em;
+  min-width: 120px;
+  width: auto;
+  height: auto;
+  appearance: menulist;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
 }
 
 body.dark .bg-white,
@@ -39,9 +88,11 @@ body.dark .period-title {
 }
 
 body.dark .period-select,
+body.dark .amount-select,
 body.dark .period-select option {
   color: #ffffff !important;
 }
+
 
 /* Highcharts SVG text override */
 body.dark .highcharts-root text,
