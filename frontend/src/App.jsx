@@ -17,7 +17,10 @@ function App() {
         className="min-h-screen flex flex-col"
         style={{ backgroundColor: "var(--app-bg)", color: "var(--app-text)" }}
       >
-        <div className="w-full flex justify-center" style={{ backgroundColor: "var(--app-bg)" }}>
+        <div
+          className="w-full flex justify-center"
+          style={{ backgroundColor: "var(--app-bg)" }}
+        >
           <div className="w-full max-w-[1200px] px-4 md:px-8">
             <Header
               language={language}
@@ -25,18 +28,20 @@ function App() {
               soundEnabled={soundEnabled}
               setSoundEnabled={setSoundEnabled}
             />
-
           </div>
         </div>
         <div className="w-full flex justify-center">
           <div className="w-full max-w-[1200px] px-4 md:px-8">
-            <Main language={language} setLanguage={setLanguage} soundEnabled={soundEnabled} />
+            <Main
+              language={language}
+              setLanguage={setLanguage}
+              soundEnabled={soundEnabled}
+            />
           </div>
         </div>
         <Footer language={language} setLanguage={setLanguage}></Footer>
         <SoundManager soundEnabled={soundEnabled} language={language} />
       </div>
-
     </ErrorBoundary>
   );
 }
