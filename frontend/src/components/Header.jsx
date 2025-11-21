@@ -10,6 +10,7 @@ import audiooff from "../assets/images/audio-off.png";
 import font from "../assets/images/font.png";
 import dark from "../assets/images/dark-mode.png";
 import info from "../assets/images/info.png";
+import MainModal from "./MainModal";
 
 const Header = ({
   language = "GE",
@@ -17,31 +18,26 @@ const Header = ({
   soundEnabled = false,
   setSoundEnabled = () => {},
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [fontSizeLevel, setFontSizeLevel] = useState(0); // 0=default, 1=large, 2=larger
 
-  // Set default font size on mount and clear any stored value
+  // Set default font size on mount
   useEffect(() => {
     try {
-      // Clear any stored font size to ensure default on first load
       localStorage.removeItem("fontSizeLevel");
       setFontSizeLevel(0);
-      document.body.dataset.fontSize = '';
-    } catch (e) {
-      // ignore storage errors
-    }
+      document.body.dataset.fontSize = "";
+    } catch (e) {}
   }, []);
 
-  // Toggle through font sizes: default -> large -> larger -> default
   const toggleFontSize = () => {
     const newLevel = (fontSizeLevel + 1) % 3;
     setFontSizeLevel(newLevel);
-    document.body.dataset.fontSize = newLevel > 0 ? newLevel.toString() : '';
+    document.body.dataset.fontSize = newLevel > 0 ? newLevel.toString() : "";
     try {
       localStorage.setItem("fontSizeLevel", newLevel.toString());
-    } catch (e) {
-      // ignore storage errors
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -51,9 +47,7 @@ const Header = ({
       setIsDarkMode(initial);
       if (initial) document.body.classList.add("dark");
       else document.body.classList.remove("dark");
-    } catch (e) {
-      // ignore storage errors
-    }
+    } catch (e) {}
   }, []);
 
   const toggleDark = () => {
@@ -61,14 +55,10 @@ const Header = ({
     setIsDarkMode(newValue);
     try {
       localStorage.setItem("darkMode", newValue ? "true" : "false");
-    } catch (e) {
-      // ignore storage errors
-    }
+    } catch (e) {}
     if (newValue) document.body.classList.add("dark");
     else document.body.classList.remove("dark");
   };
-  const fontClass =
-    language === "GE" ? "bpg_mrgvlovani_caps" : "bpg_mrgvlovani_caps";
 
   const toggleLanguage = () => {
     setLanguage(language === "GE" ? "EN" : "GE");
@@ -78,7 +68,6 @@ const Header = ({
     const newValue = !soundEnabled;
     setSoundEnabled(newValue);
 
-    // Directly play TTS on user gesture
     const message = newValue
       ? language === "GE"
         ? "აუდიო გახმოვანების ჩართვა"
@@ -93,7 +82,6 @@ const Header = ({
         message
       )}&lang=${langParam}`;
 
-      // Stop previous audio if any
       if (window.currentAudio) {
         window.currentAudio.pause();
         window.currentAudio.currentTime = 0;
@@ -101,10 +89,12 @@ const Header = ({
 
       const audio = new Audio(url);
       audio.volume = 0.4;
-      audio.play().catch(() => {}); // catch if blocked
+      audio.play().catch(() => {});
       window.currentAudio = audio;
     }
   };
+
+  const fontClass = language === "GE" ? "bpg_mrgvlovani_caps" : "bpg_mrgvlovani_caps";
 
   return (
     <header
@@ -164,7 +154,13 @@ const Header = ({
                 if (e.key === "Enter" || e.key === " ") toggleFontSize();
               }}
               className="w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110"
-              aria-label={`Toggle font size (currently ${fontSizeLevel === 0 ? 'default' : fontSizeLevel === 1 ? 'large' : 'larger'})`}
+              aria-label={`Toggle font size (currently ${
+                fontSizeLevel === 0
+                  ? "default"
+                  : fontSizeLevel === 1
+                  ? "large"
+                  : "larger"
+              })`}
             />
             <img
               src={dark}
@@ -183,6 +179,7 @@ const Header = ({
               src={info}
               alt="info"
               className="w-[22px] h-[23px] cursor-pointer transition-transform hover:scale-110"
+              onClick={() => setIsModalOpen(true)}
             />
           </div>
 
@@ -204,6 +201,15 @@ const Header = ({
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <MainModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          language={language}
+        />
+      )}
     </header>
   );
 };

@@ -26,7 +26,7 @@ const InfoModal = ({ isOpen, onClose, language }) => {
       <html>
         <head>
           <title>${
-            language === "GE" ? "ფასების კალეიდოსკოპი" : "SPRICE KALEIDOSCOPE"
+            language === "GE" ? "სამომხმარებლო ფასების ინდექსის კალკულატორი" : "Consumer Price Index Calculator"
           }</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
