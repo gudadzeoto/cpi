@@ -252,7 +252,23 @@ const Main = ({
     }
   };
 
+  const getCurrencyText = (year) => {
+    const y = parseInt(year, 10);
+    if (y >= 1988 && y <= 1995) {
+      return "მანეთი მანეთის, კუპონის და ლარის";
+    }
+    return "ლარი ლარის";
+  };
+
+  const getCurrencyTextEN = (year) => {
+    const y = parseInt(year, 10);
+    if (y >= 1988 && y <= 1995) return "Maneti";
+    return "Georgian Lari";
+  };
+
   // Highcharts options
+  const titleFontSize = language === "GE" ? "var(--h4-font-size)" : "14px";
+
   const chartOptions = {
     chart: { backgroundColor: "transparent" },
     credits: { enabled: false },
@@ -261,10 +277,19 @@ const Main = ({
         language === "GE"
           ? "სამომხმარებლო ფასების ინდექსის ცვლილება საბაზო (საწყის) პერიოდთან შედარებით"
           : "Consumer Price Index change compared to base period",
+      useHTML: language === "GE",
+      align: "center",
+      x: 0,
       style: {
-        fontSize: "14px",
+        display: "block",
+        width: "100%",
+        maxWidth: "100%",
+        margin: "0 auto",
+        fontSize: titleFontSize,
         fontFamily: "bpg_mrgvlovani_caps",
         color: "#333333",
+        whiteSpace: "normal",
+        // textAlign: "center",
       },
     },
     xAxis: {
@@ -446,35 +471,51 @@ const Main = ({
                     language === "GE"
                       ? `სამომხმარებლო ფასების ინდექსის ცვლილებამ ${endYear} წლის ${monthsWithShi(
                           endMonth
-                        )}, ${startYear} წლის ${monthsWithTan(
+                        )} ${startYear} წლის ${monthsWithTan(
                           startMonth
-                        )} შედარებით შეადგინა ${calculatedValue} პროცენტი.`
-                      : `Consumer Price Index change from ${
-                          monthsEN[startMonth - 1]
-                        } ${startYear} to ${
+                        )} შესაბამის პერიოდში შეადგინა ${calculatedValue} პროცენტი.`
+                      : `The change in the Consumer Price Index in ${
                           monthsEN[endMonth - 1]
-                        } ${endYear} is ${calculatedValue} percent.`;
+                        } ${endYear} compared to ${
+                          monthsEN[startMonth - 1]
+                        } ${startYear} amounted to ${calculatedValue} percent.`;
+
                   if (window.playText) window.playText(text);
                 }}
               >
-                სამომხმარებლო ფასების ინდექსის ცვლილებამ {endYear} წლის{" "}
-                {monthsWithShi(endMonth)} {startYear} წლის{" "}
-                {monthsWithTan(startMonth)} შედარებით შეადგინა{" "}
-                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
-                  {calculatedValue}%.
-                </span>
+                {language === "GE" ? (
+                  <>
+                    სამომხმარებლო ფასების ინდექსის ცვლილებამ {endYear} წლის{" "}
+                    {monthsWithShi(endMonth)} {startYear} წლის{" "}
+                    {monthsWithTan(startMonth)} შედარებით შეადგინა{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {calculatedValue}%.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    The Consumer Price Index change in {monthsEN[endMonth - 1]}{" "}
+                    {endYear} compared to {monthsEN[startMonth - 1]} {startYear}{" "}
+                    amounted to{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {calculatedValue}%.
+                    </span>
+                  </>
+                )}
               </p>
+
               {/* AMOUNT RESULT */}
               <p
                 className="mb-2"
                 id="resultTexts"
                 tabIndex={0}
                 onClick={() => {
+                  const currencyText = getCurrencyText(startYear);
                   const text =
                     language === "GE"
                       ? `${startYear} წლის ${monthsWithIs(
                           startMonth
-                        )} ${amount} ლარი ლარის ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
+                        )} ${amount} ${currencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
                           endMonth
                         )} მდგომარეობით შეადგენს ${computedAmount()} ლარს.`
                       : `${amount} lari in ${
@@ -485,21 +526,40 @@ const Main = ({
                   if (window.playText) window.playText(text);
                 }}
               >
-                {startYear} წლის {monthsWithIs(startMonth)}{" "}
-                <span style={{ fontWeight: "bold", color: "#01389c" }}>
-                  {amount}
-                </span>{" "}
-                ლარი ლარის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
-                {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
-                <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
-                  {computedAmount()}
-                </span>{" "}
-                ლარს.
+                {language === "GE" ? (
+                  <>
+                    {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    {getCurrencyText(startYear)} ინფლაციის გათვალისწინებით{" "}
+                    {endYear} წლის {monthsWithIs(endMonth)} მდგომარეობით
+                    შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    ლარს.
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    {getCurrencyTextEN(startYear)} in {monthsEN[startMonth - 1]}{" "}
+                    {startYear}, taking into consideration inflation of{" "}
+                    {getCurrencyTextEN(startYear)}, is worth{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    {getCurrencyTextEN(endYear)} in {monthsEN[endMonth - 1]}{" "}
+                    {endYear}.
+                  </>
+                )}
               </p>
 
               {/* NOTE TEXT */}
               <p
-                className="text-gray-500 text-xs period-select"
+                className="text-gray-500 text-xs note-select"
                 id="Note"
                 tabIndex={0}
                 onClick={() => {

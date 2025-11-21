@@ -100,7 +100,7 @@ const InfoModal = ({ isOpen, onClose, language }) => {
             <h5 className="text-xl font-bold bpg_mrgvlovani_caps">
               {language === "GE"
                 ? "როგორ მუშაობს სამომხმარებლო ფასების ინდექსის კალკულატორი"
-                : "How Does the Salary Calculator Work"}
+                : "How does the Consumer Price Index calculator work"}
             </h5>
             <button
               onClick={onClose}
@@ -140,69 +140,74 @@ const InfoModal = ({ isOpen, onClose, language }) => {
                 </p>
                 <p className="font-bold mt-4">3. შედეგების ინტერპრეტაცია</p>
                 <p>
-                  მონაცემების შეყვანის შემდეგ მიიღებთ შემდეგ ინფორმაციას: a.
-                  არჩეული დროითი პერიოდისთვის სამომხმარებლო ფასების ინდექსის
-                  საერთო ცვლილებას; b. ინფლაციის, ასევე სახელმწიფო ვალუტის
-                  ერთეულის ცვლილების გათვალისწინებით, მითითებული თანხის
-                  ღირებულებას არჩეული დროითი პერიოდის მდგომარეობით; c. არჩეულ
-                  საწყის პერიოდთან შედარებით ინფლაციის მაჩვენებლის დინამიკას,
-                  გრაფიკის სახით.
+                  მონაცემების შეყვანის შემდეგ მიიღებთ შემდეგ ინფორმაციას:
                 </p>
+                <br />
+                <ul>
+                  <li>
+                    a. არჩეული დროითი პერიოდისთვის სამომხმარებლო ფასების
+                    ინდექსის საერთო ცვლილებას;
+                  </li>
+                  <li>
+                    b. ინფლაციის, ასევე სახელმწიფო ვალუტის ერთეულის ცვლილების
+                    გათვალისწინებით, მითითებული თანხის ღირებულებას არჩეული
+                    დროითი პერიოდის მდგომარეობით;
+                  </li>
+                  <li>
+                    c. არჩეულ საწყის პერიოდთან შედარებით ინფლაციის მაჩვენებლის
+                    დინამიკას, გრაფიკის სახით.
+                  </li>
+                </ul>
               </>
             ) : (
               <>
                 <p>
-                  The Price Kaleidoscope is a chart representing the inflation
-                  rate by product and service groups and subgroups (according to
-                  COICOP), as well as their weights in the consumer basket.
+                  Consumer Price Index Calculator enables users to calculate a
+                  total change in the index for a desirable period. It also
+                  makes possible indexation of a particular amount of money
+                  according to inflation.
                 </p>
-                <p className="font-bold mt-4">
-                  Using the Price Kaleidoscope, you can:
-                </p>
+                <p className="font-bold mt-4"></p>
                 <ul>
                   <li>
-                    Compare the rate of price change across different product
-                    and service subgroups;
-                  </li>
-                  <li>
-                    Compare the relative importance of individual subgroups in
-                    forming the inflation rate – their weights in the consumer
-                    basket.
+                    For calculation of amount of money from previous periods the
+                    calculator uses monthly chained official Consumer Price
+                    Indices.
                   </li>
                 </ul>
-                <p className="font-bold mt-4">Instructions</p>
-                <p className="font-bold mt-4">1. Select a time period</p>
+                <p className="font-bold mt-4">Filling in steps</p>
+                <p className="font-bold mt-4">1. Choose a time period</p>
                 <p>
-                  Choose the year and month for which you want to analyze the
-                  inflation rate.
+                  In order to use the calculator for indexation purposes first
+                  you should indicate the start and end time periods. The start
+                  period (“from”) corresponds to the period to which the amount
+                  belongs, whereas the end period (“to”) corresponds to a period
+                  for which you would like to calculate the amount (the end
+                  period participates in calculation).
                 </p>
-                <p className="font-bold mt-4">2. Specify the base period</p>
+                <p className="font-bold mt-4">2. Indicate the money amount</p>
                 <p>
-                  Choose one of the two base periods (inflation compared to the
-                  previous month or the same month of the previous year).
+                  In the corresponding cell enter an amount of money that you
+                  are interested to calculate for a chosen period.
                 </p>
-                <p className="font-bold mt-4">3. Interpreting the results</p>
+                <p className="font-bold mt-4">3. Interpretation of results</p>
                 <p>
-                  Each segment of the chart reflects the weight of a product or
-                  service subgroup in the consumer basket and the percentage
-                  change in price compared to the selected base period. Hovering
-                  over a segment shows the following information about that
-                  subgroup:
+                  After filling in corresponding cells you will obtain following
+                  information:
                 </p>
                 <br />
                 <ul>
-                  <li>Name of the subgroup</li>
-                  <li>Percentage change in price for the subgroup</li>
-                  <li>Weight of the subgroup in the consumer basket</li>
+                  <li>a. Total change in the index for a chosen period;</li>
+                  <li>
+                    b. The amount of money as of the end of chosen period,
+                    taking into consideration inflation and change of currency
+                    units;
+                  </li>
+                  <li>
+                    c. Graph expressing the dynamics of inflation rate compared
+                    to the chosen start period.
+                  </li>
                 </ul>
-                <br />
-                <p>
-                  The area of a segment reflects the weight of the subgroup in
-                  the consumer basket. The larger the area of a sector, the more
-                  important the subgroup is in forming the inflation rate. The
-                  color coding of segments represents the extent of price change
-                  according to the scale below the chart.
-                </p>
               </>
             )}
           </div>

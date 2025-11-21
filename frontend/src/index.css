@@ -64,6 +64,10 @@ button {
   -moz-appearance: menulist;
 }
 
+.note {
+  font-size: var(--body-font-size);
+}
+
 body.dark .bg-white,
 body.dark .bg-gray-50,
 body.dark .bg-gray-100,
@@ -89,6 +93,7 @@ body.dark .period-title {
 
 body.dark .period-select,
 body.dark .amount-select,
+body.dark .note,
 body.dark .period-select option {
   color: #ffffff !important;
 }
@@ -128,4 +133,19 @@ body.dark .period-select {
 
 body.dark .period-select::-ms-expand {
   display: none;
+}
+
+/* Ensure Highcharts HTML titles (used for Georgian) are centered and can wrap */
+.highcharts-container .highcharts-title {
+  /* left: 50% !important; */
+  /* transform: translateX(-50%) !important; */
+  width: 80% !important; /* keep a max width so long titles wrap nicely */
+  max-width: 100% !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+/* If Highcharts injects inner nodes, make sure text is centered too */
+.highcharts-container .highcharts-title * {
+  text-align: center !important;
 }
