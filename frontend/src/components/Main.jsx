@@ -78,11 +78,15 @@ const Main = ({
 
   const [calculatedValue, setCalculatedValue] = useState(null);
 
+  const [indexStartDate, setIndexStartDate] = useState(null);
+  const [indexEndDate, setIndexEndDate] = useState(null);
+
   const computedAmount = () => {
     const numericAmount = parseFloat(amount);
-    if (isNaN(numericAmount) || calculatedValue === null) return 0;
-    const multiplier = 1 + parseFloat(calculatedValue) / 100;
-    return (numericAmount * multiplier).toFixed(2);
+    if (isNaN(numericAmount) || indexStartDate === null || indexEndDate === null) return 0;
+    if (Number(indexStartDate) === 0) return 0;
+    const result = (Number(indexEndDate) / Number(indexStartDate)) * numericAmount;
+    return Number(result).toFixed(2);
   };
 
   const calculateIndex = useCallback(async () => {
@@ -94,6 +98,10 @@ const Main = ({
 
     const index_start_date = start_date.data[0].Index;
     const index_end_date = end_date.data[0].Index;
+
+    // store raw index values for other calculations
+    setIndexStartDate(index_start_date);
+    setIndexEndDate(index_end_date);
 
     const calculated = (
       (index_end_date / index_start_date) * 100 -
