@@ -173,7 +173,11 @@ const Main = ({
     if (startYear && endYear) {
       const startY = parseInt(startYear, 10);
       const endY = parseInt(endYear, 10);
-      if (startY >= 1988 && startY <= 1990 && endY >= 1988 && endY <= 1990) {
+      if (
+        (startY >= 1988 && startY <= 1990 && endY >= 1988 && endY <= 1990) ||
+        startY === 1990 ||
+        endY === 1990
+      ) {
         setShowWarningModal(true);
       } else {
         setShowWarningModal(false);
@@ -458,7 +462,15 @@ const Main = ({
             <select
               value={startYear}
               id="startYearSlct"
-              onChange={(e) => setStartYear(e.target.value)}
+              onChange={(e) => {
+                setStartYear(e.target.value);
+                const y = parseInt(e.target.value, 10);
+                if (y >= 1988 && y <= 1990) {
+                  setStartMonth("1");
+                } else {
+                  setStartMonth("");
+                }
+              }}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
@@ -474,7 +486,8 @@ const Main = ({
               value={startMonth}
               id="startMonthSlct"
               onChange={(e) => setStartMonth(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
+              disabled={startYear && parseInt(startYear, 10) >= 1988 && parseInt(startYear, 10) <= 1990}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ თვე" : "Select month"}
@@ -495,7 +508,15 @@ const Main = ({
             <select
               value={endYear}
               id="endYearSlct"
-              onChange={(e) => setEndYear(e.target.value)}
+              onChange={(e) => {
+                setEndYear(e.target.value);
+                const y = parseInt(e.target.value, 10);
+                if (y >= 1988 && y <= 1990) {
+                  setEndMonth("1");
+                } else {
+                  setEndMonth("");
+                }
+              }}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
@@ -511,7 +532,8 @@ const Main = ({
               value={endMonth}
               id="endMonthSlct"
               onChange={(e) => setEndMonth(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
+              disabled={endYear && parseInt(endYear, 10) >= 1988 && parseInt(endYear, 10) <= 1990}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed"
             >
               <option value="" disabled hidden>
                 {language === "GE" ? "აირჩიეთ თვე" : "Select month"}
