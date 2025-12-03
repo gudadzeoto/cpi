@@ -462,15 +462,7 @@ const Main = ({
             <select
               value={startYear}
               id="startYearSlct"
-              onChange={(e) => {
-                setStartYear(e.target.value);
-                const y = parseInt(e.target.value, 10);
-                if (y >= 1988 && y <= 1990) {
-                  setStartMonth("1");
-                } else {
-                  setStartMonth("");
-                }
-              }}
+              onChange={(e) => setStartYear(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
@@ -508,15 +500,7 @@ const Main = ({
             <select
               value={endYear}
               id="endYearSlct"
-              onChange={(e) => {
-                setEndYear(e.target.value);
-                const y = parseInt(e.target.value, 10);
-                if (y >= 1988 && y <= 1990) {
-                  setEndMonth("1");
-                } else {
-                  setEndMonth("");
-                }
-              }}
+              onChange={(e) => setEndYear(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm w-[170px] focus:outline-none focus:ring-2 focus:ring-blue-400 text-[#333] period-select cursor-pointer"
             >
               <option value="" disabled hidden>
