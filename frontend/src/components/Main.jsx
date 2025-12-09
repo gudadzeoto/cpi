@@ -567,26 +567,6 @@ const Main = ({
               <p className="mb-2 font-semibold text-center">
                 {language === "GE" ? "შედეგი:" : "Result:"}
               </p>
-
-              {/* NOTE TEXT - Show at beginning if start year is 1988-1990 */}
-              {parseInt(startYear, 10) >= 1988 && parseInt(startYear, 10) <= 1990 && (
-                <p
-                  className="text-gray-500 text-xs note-select mb-3"
-                  tabIndex={0}
-                  onClick={() => {
-                    const text =
-                      language === "GE"
-                        ? "1988-1990 წლებში გაანგარიშებაში მონაწილეობს ინფლაციის წლიური კოეფიციენტები."
-                        : "In 1988-1990 annual inflation coefficients are used for calculation.";
-                    if (window.playText) window.playText(text);
-                  }}
-                >
-                  {language === "GE"
-                    ? "1988-1990 წლებში გაანგარიშებაში მონაწილეობს ინფლაციის წლიური კოეფიციენტები."
-                    : "In 1988-1990 annual inflation coefficients are used for calculation."}
-                </p>
-              )}
-
               {/* RESULT TEXT */}
               <p
                 className="mb-2"
@@ -1083,21 +1063,13 @@ const Main = ({
                 tabIndex={0}
                 onClick={() => {
                   const text =
-                    parseInt(startYear, 10) >= 1988 && parseInt(startYear, 10) <= 1990
-                      ? language === "GE"
-                        ? "1988-1990 წლებში გაანგარიშებაში მონაწილეობს ინფლაციის წლიური კოეფიციენტები."
-                        : "In 1988-1990 annual inflation coefficients are used for calculation."
-                      : language === "GE"
+                    language === "GE"
                       ? "შენიშვნა: საბოლოო პერიოდი მონაწილეობს გაანგარიშებაში."
                       : "Note: the end period participates in calculation.";
                   if (window.playText) window.playText(text);
                 }}
               >
-                {parseInt(startYear, 10) >= 1988 && parseInt(startYear, 10) <= 1990
-                  ? language === "GE"
-                    ? "1988-1990 წლებში გაანგარიშებაში მონაწილეობს ინფლაციის წლიური კოეფიციენტები."
-                    : "In 1988-1990 annual inflation coefficients are used for calculation."
-                  : language === "GE"
+                {language === "GE"
                   ? "შენიშვნა: საბოლოო პერიოდი მონაწილეობს გაანგარიშებაში."
                   : "Note: the end period participates in calculation."}
               </p>
