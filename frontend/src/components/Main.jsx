@@ -731,7 +731,8 @@ const Main = ({
                         endY === 1994 ||
                         (endY === 1995 && endM <= 9))
                     ) {
-                      startCurrencyTextEN = "coupon/maneti of maneti and coupon";
+                      startCurrencyTextEN =
+                        "coupon/maneti of maneti and coupon";
                       endCurrencyTextEN = "coupon";
                     }
                     // Coupon/Manat transitional period
@@ -743,7 +744,8 @@ const Main = ({
                       endM >= 4 &&
                       endM <= 7
                     ) {
-                      startCurrencyTextEN = "coupon/maneti of maneti and coupon";
+                      startCurrencyTextEN =
+                        "coupon/maneti of maneti and coupon";
                       endCurrencyTextEN = "coupon/maneti";
                     }
                     // Manat to Lari period
@@ -795,18 +797,33 @@ const Main = ({
                     }
                   }
 
+                  const isStartBlocked = (startY >= 1988 && startY <= 1990);
+                  const isEndBlocked = (endY >= 1988 && endY <= 1990);
+
                   const text =
                     language === "GE"
-                      ? `${startYear} წლის ${monthsWithIs(
-                          startMonth
-                        )} ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
-                          endMonth
-                        )} მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
-                      : `${amount} ${startCurrencyTextEN} in ${
-                          monthsEN[startMonth - 1]
-                        } ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${
-                          monthsEN[endMonth - 1]
-                        } ${endYear}.`;
+                      ? (isStartBlocked && isEndBlocked)
+                        ? `${startYear} წლის ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
+                        : isStartBlocked
+                        ? `${startYear} წლის ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
+                            endMonth
+                          )} მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
+                        : `${startYear} წლის ${monthsWithIs(
+                            startMonth
+                          )} ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
+                            endMonth
+                          )} მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
+                      : (isStartBlocked && isEndBlocked)
+                        ? `${amount} ${startCurrencyTextEN} in ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${endYear}.`
+                        : isStartBlocked
+                        ? `${amount} ${startCurrencyTextEN} in ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${
+                            monthsEN[endMonth - 1]
+                          } ${endYear}.`
+                        : `${amount} ${startCurrencyTextEN} in ${
+                            monthsEN[startMonth - 1]
+                          } ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${
+                            monthsEN[endMonth - 1]
+                          } ${endYear}.`;
                   if (window.playText) window.playText(text);
                 }}
               >
@@ -827,7 +844,8 @@ const Main = ({
                     startM <= 7 &&
                     ((endY === 1995 && endM >= 10) || endY > 1995)
                   ) {
-                    startCurrencyText = "კუპონი/მანეთი მანეთის, კუპონის და ლარის";
+                    startCurrencyText =
+                      "კუპონი/მანეთი მანეთის, კუპონის და ლარის";
                     endCurrencyText = "ლარს";
                   }
                   // Coupon/Manat to Coupon period: April-July 1993 → August 1993-September 1995
@@ -978,14 +996,17 @@ const Main = ({
                     endCurrencyTextEN = "Georgian Lari";
                   }
 
+                  const isStartBlocked = (startY >= 1988 && startY <= 1990);
+                  const isEndBlocked = (endY >= 1988 && endY <= 1990);
+
                   return language === "GE" ? (
                     <>
-                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      {startYear} წლის {!isStartBlocked && <>{monthsWithIs(startMonth)}{" "}</>}
                       <span style={{ fontWeight: "bold", color: "#01389c" }}>
                         {amount}
                       </span>{" "}
                       {startCurrencyText} ინფლაციის გათვალისწინებით {endYear}{" "}
-                      წლის {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                      წლის {!isEndBlocked && <>{monthsWithIs(endMonth)}{" "}</>}მდგომარეობით შეადგენს{" "}
                       <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
                         {computedAmount()}
                       </span>{" "}
@@ -996,12 +1017,13 @@ const Main = ({
                       <span style={{ fontWeight: "bold", color: "#01389c" }}>
                         {amount}
                       </span>{" "}
-                      {startCurrencyTextEN} in {monthsEN[startMonth - 1]} {startYear}, adjusted
-                      for inflation, equals{" "}
+                      {startCurrencyTextEN} in {!isStartBlocked && <>{monthsEN[startMonth - 1]}{" "}</>}
+                      {startYear}, adjusted for inflation, equals{" "}
                       <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
                         {computedAmount()}
                       </span>{" "}
-                      {endCurrencyTextEN} as of {monthsEN[endMonth - 1]} {endYear}.
+                      {endCurrencyTextEN} as of {!isEndBlocked && <>{monthsEN[endMonth - 1]}{" "}</>}
+                      {endYear}.
                     </>
                   );
                 })()}
