@@ -103,12 +103,12 @@ const Main = ({
     const start_date = await api.get(`/cpiindexes/${startYear}/${startMonth}`);
     const end_date = await api.get(`/cpiindexes/${endYear}/${endMonth}`);
 
-    const index_start_date = start_date.data[0].IndexStr;
-    const index_end_date = end_date.data[0].IndexStr;
+    const index_start_date = start_date.data[0].Index;
+    const index_end_date = end_date.data[0].Index;
 
     // store raw index values for other calculations
-    setIndexStartDate(start_date.data[0].Index);
-    setIndexEndDate(end_date.data[0].Index);
+    setIndexStartDate(index_start_date);
+    setIndexEndDate(index_end_date);
 
     const calculated = (
       (index_end_date / index_start_date) * 100 -
@@ -616,417 +616,444 @@ const Main = ({
                 id="resultTexts"
                 tabIndex={0}
                 onClick={() => {
-                  // Determine currency text based on period
-                  let startCurrencyText = "";
-                  let endCurrencyText = "";
-
-                  const startY = parseInt(startYear, 10);
-                  const startM = parseInt(startMonth, 10);
-                  const endY = parseInt(endYear, 10);
-                  const endM = parseInt(endMonth, 10);
-
-                  // Coupon/Manat to Lari period: April-July 1993 → October 1995 onwards
-                  if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1995 && endM >= 10) || endY > 1995)
-                  ) {
-                    startCurrencyText = "კუპონი/მანეთი კუპონის და ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-                  // Coupon/Manat to Coupon period: April-July 1993 → August 1993-September 1995
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1993 && endM >= 8) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyText = "კუპონი/მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Coupon/Manat transitional period: April-July 1993 → April-July 1993
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    endY === 1993 &&
-                    endM >= 4 &&
-                    endM <= 7
-                  ) {
-                    startCurrencyText = "კუპონი/მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს/მანეთს";
-                  }
-                  // Manat to Lari period: 1988-March 1993 → October 1995 onwards
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    (endY > 1995 || (endY === 1995 && endM >= 10))
-                  ) {
-                    startCurrencyText = "მანეთი მანეთის, კუპონის და ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-                  // Manat to Coupon period: 1988-March 1993 → April 1993-September 1995
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    ((endY === 1993 && endM >= 4) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyText = "მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Coupon to Lari period: August 1993-September 1995 → October 1995 onwards
-                  else if (
-                    ((startY === 1993 && startM >= 8) ||
-                      startY === 1994 ||
-                      (startY === 1995 && startM <= 9)) &&
-                    ((endY === 1995 && endM >= 10) || endY > 1995)
-                  ) {
-                    startCurrencyText = "კუპონი კუპონის და ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-                  // Coupon period: August 1993-September 1995 → August 1993-September 1995
-                  else if (isCouponOnlyPeriod()) {
-                    startCurrencyText = "კუპონი კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Manat period: 1988 to March 1993
-                  else if (isManatPeriod()) {
-                    startCurrencyText = "მანეთი მანეთის";
-                    endCurrencyText = "მანეთს";
-                  }
-                  // Lari period: October 1995 onwards
-                  else if (isLariPeriod()) {
-                    startCurrencyText = "ლარი ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-
-                  // English currency text
-                  let startCurrencyTextEN = "";
-                  let endCurrencyTextEN = "";
-
-                  if (language === "EN") {
-                    // Coupon/Manat to Lari period
-                    if (
-                      startY === 1993 &&
-                      startM >= 4 &&
-                      startM <= 7 &&
-                      ((endY === 1995 && endM >= 10) || endY > 1995)
-                    ) {
-                      startCurrencyTextEN = "coupon/maneti of coupon and lari";
-                      endCurrencyTextEN = "Georgian Lari";
-                    }
-                    // Coupon/Manat to Coupon period
-                    else if (
-                      startY === 1993 &&
-                      startM >= 4 &&
-                      startM <= 7 &&
-                      ((endY === 1993 && endM >= 8) ||
-                        endY === 1994 ||
-                        (endY === 1995 && endM <= 9))
-                    ) {
-                      startCurrencyTextEN =
-                        "coupon/maneti of maneti and coupon";
-                      endCurrencyTextEN = "coupon";
-                    }
-                    // Coupon/Manat transitional period
-                    else if (
-                      startY === 1993 &&
-                      startM >= 4 &&
-                      startM <= 7 &&
-                      endY === 1993 &&
-                      endM >= 4 &&
-                      endM <= 7
-                    ) {
-                      startCurrencyTextEN =
-                        "coupon/maneti of maneti and coupon";
-                      endCurrencyTextEN = "coupon/maneti";
-                    }
-                    // Manat to Lari period
-                    else if (
-                      startY >= 1988 &&
-                      startY <= 1993 &&
-                      (startY < 1993 || startM <= 3) &&
-                      (endY > 1995 || (endY === 1995 && endM >= 10))
-                    ) {
-                      startCurrencyTextEN = "maneti of maneti, coupon and lari";
-                      endCurrencyTextEN = "Georgian Lari";
-                    }
-                    // Manat to Coupon period
-                    else if (
-                      startY >= 1988 &&
-                      startY <= 1993 &&
-                      (startY < 1993 || startM <= 3) &&
-                      ((endY === 1993 && endM >= 4) ||
-                        endY === 1994 ||
-                        (endY === 1995 && endM <= 9))
-                    ) {
-                      startCurrencyTextEN = "maneti of maneti and coupon";
-                      endCurrencyTextEN = "coupon";
-                    }
-                    // Coupon to Lari period
-                    else if (
-                      ((startY === 1993 && startM >= 8) ||
-                        startY === 1994 ||
-                        (startY === 1995 && startM <= 9)) &&
-                      ((endY === 1995 && endM >= 10) || endY > 1995)
-                    ) {
-                      startCurrencyTextEN = "coupon of coupon and lari";
-                      endCurrencyTextEN = "Georgian Lari";
-                    }
-                    // Coupon period
-                    else if (isCouponOnlyPeriod()) {
-                      startCurrencyTextEN = "coupon of coupon";
-                      endCurrencyTextEN = "coupon";
-                    }
-                    // Manat period
-                    else if (isManatPeriod()) {
-                      startCurrencyTextEN = "maneti of maneti";
-                      endCurrencyTextEN = "maneti";
-                    }
-                    // Lari period
-                    else if (isLariPeriod()) {
-                      startCurrencyTextEN = "lari of lari";
-                      endCurrencyTextEN = "Georgian Lari";
-                    }
-                  }
-
-                  const isStartBlocked = (startY >= 1988 && startY <= 1990);
-                  const isEndBlocked = (endY >= 1988 && endY <= 1990);
-
+                  const currencyText = getCurrencyText(startYear);
                   const text =
                     language === "GE"
-                      ? (isStartBlocked && isEndBlocked)
-                        ? `${startYear} წლის ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
-                        : isStartBlocked
-                        ? `${startYear} წლის ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
-                            endMonth
-                          )} მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
-                        : `${startYear} წლის ${monthsWithIs(
-                            startMonth
-                          )} ${amount} ${startCurrencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
-                            endMonth
-                          )} მდგომარეობით შეადგენს ${computedAmount()} ${endCurrencyText}.`
-                      : (isStartBlocked && isEndBlocked)
-                        ? `${amount} ${startCurrencyTextEN} in ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${endYear}.`
-                        : isStartBlocked
-                        ? `${amount} ${startCurrencyTextEN} in ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${
-                            monthsEN[endMonth - 1]
-                          } ${endYear}.`
-                        : `${amount} ${startCurrencyTextEN} in ${
-                            monthsEN[startMonth - 1]
-                          } ${startYear}, adjusted for inflation, equals ${computedAmount()} ${endCurrencyTextEN} as of ${
-                            monthsEN[endMonth - 1]
-                          } ${endYear}.`;
+                      ? `${startYear} წლის ${monthsWithIs(
+                          startMonth
+                        )} ${amount} ${currencyText} ინფლაციის გათვალისწინებით ${endYear} წლის ${monthsWithIs(
+                          endMonth
+                        )} მდგომარეობით შეადგენს ${computedAmount()} ლარს.`
+                      : `${amount} lari in ${
+                          monthsEN[startMonth - 1]
+                        } ${startYear}, adjusted for inflation, equals ${computedAmount()} lari as of ${
+                          monthsEN[endMonth - 1]
+                        } ${endYear}.`;
                   if (window.playText) window.playText(text);
                 }}
               >
-                {(() => {
-                  // Determine currency text based on period
-                  let startCurrencyText = "";
-                  let endCurrencyText = "";
-
-                  const startY = parseInt(startYear, 10);
-                  const startM = parseInt(startMonth, 10);
-                  const endY = parseInt(endYear, 10);
-                  const endM = parseInt(endMonth, 10);
-
-                  // Coupon/Manat to Lari period: April-July 1993 → October 1995 onwards
-                  if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1995 && endM >= 10) || endY > 1995)
-                  ) {
-                    startCurrencyText =
-                      "კუპონი/მანეთი მანეთის, კუპონის და ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-                  // Coupon/Manat to Coupon period: April-July 1993 → August 1993-September 1995
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1993 && endM >= 8) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyText = "კუპონი/მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Coupon/Manat transitional period: April-July 1993 → April-July 1993
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    endY === 1993 &&
-                    endM >= 4 &&
-                    endM <= 7
-                  ) {
-                    startCurrencyText = "კუპონი/მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს/მანეთს";
-                  }
-                  // Manat to Lari period: 1988-March 1993 → October 1995 onwards
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    (endY > 1995 || (endY === 1995 && endM >= 10))
-                  ) {
-                    startCurrencyText = "მანეთი მანეთის, კუპონის და ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-                  // Manat to Coupon period: 1988-March 1993 → April 1993-September 1995
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    ((endY === 1993 && endM >= 4) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyText = "მანეთი მანეთის და კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Coupon period: August 1993-September 1995 → August 1993-September 1995
-                  else if (isCouponOnlyPeriod()) {
-                    startCurrencyText = "კუპონი კუპონის";
-                    endCurrencyText = "კუპონს";
-                  }
-                  // Manat period: 1988 to March 1993
-                  else if (isManatPeriod()) {
-                    startCurrencyText = "მანეთი მანეთის";
-                    endCurrencyText = "მანეთს";
-                  }
-                  // Lari period: October 1995 onwards
-                  else if (isLariPeriod()) {
-                    startCurrencyText = "ლარი ლარის";
-                    endCurrencyText = "ლარს";
-                  }
-
-                  // English currency text
-                  let startCurrencyTextEN = "";
-                  let endCurrencyTextEN = "";
-
-                  // Coupon/Manat to Lari period
-                  if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1995 && endM >= 10) || endY > 1995)
-                  ) {
-                    startCurrencyTextEN = "coupon/maneti of coupon and lari";
-                    endCurrencyTextEN = "Georgian Lari";
-                  }
-                  // Coupon/Manat to Coupon period
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    ((endY === 1993 && endM >= 8) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyTextEN = "coupon/maneti of maneti and coupon";
-                    endCurrencyTextEN = "coupon";
-                  }
-                  // Coupon/Manat transitional period
-                  else if (
-                    startY === 1993 &&
-                    startM >= 4 &&
-                    startM <= 7 &&
-                    endY === 1993 &&
-                    endM >= 4 &&
-                    endM <= 7
-                  ) {
-                    startCurrencyTextEN = "coupon/maneti of maneti and coupon";
-                    endCurrencyTextEN = "coupon/maneti";
-                  }
-                  // Manat to Lari period
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    (endY > 1995 || (endY === 1995 && endM >= 10))
-                  ) {
-                    startCurrencyTextEN = "maneti of maneti, coupon and lari";
-                    endCurrencyTextEN = "Georgian Lari";
-                  }
-                  // Manat to Coupon period
-                  else if (
-                    startY >= 1988 &&
-                    startY <= 1993 &&
-                    (startY < 1993 || startM <= 3) &&
-                    ((endY === 1993 && endM >= 4) ||
-                      endY === 1994 ||
-                      (endY === 1995 && endM <= 9))
-                  ) {
-                    startCurrencyTextEN = "maneti of maneti and coupon";
-                    endCurrencyTextEN = "coupon";
-                  }
-                  // Coupon to Lari period
-                  else if (
-                    ((startY === 1993 && startM >= 8) ||
-                      startY === 1994 ||
-                      (startY === 1995 && startM <= 9)) &&
-                    ((endY === 1995 && endM >= 10) || endY > 1995)
-                  ) {
-                    startCurrencyTextEN = "coupon of coupon and lari";
-                    endCurrencyTextEN = "Georgian Lari";
-                  }
-                  // Coupon period
-                  else if (isCouponOnlyPeriod()) {
-                    startCurrencyTextEN = "coupon of coupon";
-                    endCurrencyTextEN = "coupon";
-                  }
-                  // Manat period
-                  else if (isManatPeriod()) {
-                    startCurrencyTextEN = "maneti of maneti";
-                    endCurrencyTextEN = "maneti";
-                  }
-                  // Lari period
-                  else if (isLariPeriod()) {
-                    startCurrencyTextEN = "lari of lari";
-                    endCurrencyTextEN = "Georgian Lari";
-                  }
-
-                  const isStartBlocked = (startY >= 1988 && startY <= 1990);
-                  const isEndBlocked = (endY >= 1988 && endY <= 1990);
-
-                  return language === "GE" ? (
+                {parseInt(startYear, 10) >= 1988 &&
+                parseInt(startYear, 10) <= 1992 &&
+                parseInt(endYear, 10) >= 1995 &&
+                !(endYear === "1995" && parseInt(endMonth, 10) <= 9) ? (
+                  language === "GE" ? (
                     <>
-                      {startYear} წლის {!isStartBlocked && <>{monthsWithIs(startMonth)}{" "}</>}
+                      {startYear} წლის{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? ""
+                        : monthsWithIs(startMonth) + " "}
                       <span style={{ fontWeight: "bold", color: "#01389c" }}>
                         {amount}
                       </span>{" "}
-                      {startCurrencyText} ინფლაციის გათვალისწინებით {endYear}{" "}
-                      წლის {!isEndBlocked && <>{monthsWithIs(endMonth)}{" "}</>}მდგომარეობით შეადგენს{" "}
+                      მანეთი მანეთის, კუპონის და ლარის ინფლაციის გათვალისწინებით{" "}
+                      {endYear} წლის {monthsWithIs(endMonth)} მდგომარეობით
+                      შეადგენს{" "}
                       <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
                         {computedAmount()}
                       </span>{" "}
-                      {endCurrencyText}.
+                      ლარს.
                     </>
                   ) : (
                     <>
                       <span style={{ fontWeight: "bold", color: "#01389c" }}>
                         {amount}
                       </span>{" "}
-                      {startCurrencyTextEN} in {!isStartBlocked && <>{monthsEN[startMonth - 1]}{" "}</>}
-                      {startYear}, adjusted for inflation, equals{" "}
+                      manat in{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? startYear
+                        : `${monthsEN[startMonth - 1]} ${startYear}`}
+                      , taking into consideration manat, coupon and lari
+                      inflation, equals{" "}
                       <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
                         {computedAmount()}
                       </span>{" "}
-                      {endCurrencyTextEN} as of {!isEndBlocked && <>{monthsEN[endMonth - 1]}{" "}</>}
-                      {endYear}.
+                      lari as of{" "}
+                      {parseInt(endYear, 10) >= 1988 &&
+                      parseInt(endYear, 10) <= 1990
+                        ? endYear
+                        : `${monthsEN[endMonth - 1]} ${endYear}`}
+                      .
                     </>
-                  );
-                })()}
+                  )
+                ) : parseInt(startYear, 10) >= 1988 &&
+                  parseInt(startYear, 10) <= 1993 &&
+                  !(
+                    parseInt(startYear, 10) === 1993 &&
+                    parseInt(startMonth, 10) >= 4
+                  ) &&
+                  (endYear === "1994" ||
+                    (endYear === "1995" && parseInt(endMonth, 10) <= 9)) ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? ""
+                        : monthsWithIs(startMonth) + " "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      მანეთი მანეთის და კუპონის ინფლაციის გათვალისწინებით{" "}
+                      {endYear} წლის {monthsWithIs(endMonth)} მდგომარეობით
+                      შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      კუპონს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      manat in{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? startYear
+                        : `${monthsEN[startMonth - 1]} ${startYear}`}
+                      , taking into consideration manat and coupon inflation,
+                      equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      coupon as of{" "}
+                      {parseInt(endYear, 10) >= 1988 &&
+                      parseInt(endYear, 10) <= 1990
+                        ? endYear
+                        : `${monthsEN[endMonth - 1]} ${endYear}`}
+                      .
+                    </>
+                  )
+                ) : startYear === "1993" &&
+                  parseInt(startMonth, 10) >= 4 &&
+                  parseInt(startMonth, 10) <= 7 &&
+                  (endYear === "1994" || endYear === "1995") ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      კუპონი/მანეთი მანეთის და კუპონის ინფლაციის გათვალისწინებით{" "}
+                      {endYear} წლის {monthsWithIs(endMonth)} მდგომარეობით
+                      შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      კუპონს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      coupon/manat in {monthsEN[startMonth - 1]} {startYear},
+                      taking into consideration manat and coupon inflation,
+                      equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      coupon as of {monthsEN[endMonth - 1]} {endYear}.
+                    </>
+                  )
+                ) : startYear === "1993" &&
+                  parseInt(startMonth, 10) >= 4 &&
+                  parseInt(startMonth, 10) <= 7 &&
+                  parseInt(endYear, 10) >= 1996 ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      კუპონი/მანეთი მანეთის, კუპონის და ლარის ინფლაციის
+                      გათვალისწინებით {endYear} წლის {monthsWithIs(endMonth)}{" "}
+                      მდგომარეობით შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      ლარს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      coupon/manat in {monthsEN[startMonth - 1]} {startYear},
+                      taking into consideration manat, coupon and lari
+                      inflation, equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      lari as of {monthsEN[endMonth - 1]} {endYear}.
+                    </>
+                  )
+                ) : startYear === "1993" &&
+                  startMonth === "4" &&
+                  endYear === "1993" &&
+                  parseInt(endMonth, 10) >= 4 &&
+                  parseInt(endMonth, 10) <= 7 &&
+                  language === "GE" ? (
+                  <>
+                    {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    კუპონი/მანეთი მანეთის და კუპონის ინფლაციის გათვალისწინებით{" "}
+                    {endYear} წლის {monthsWithIs(endMonth)} მდგომარეობით
+                    შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    კუპონს.
+                  </>
+                ) : endYear === "1992" &&
+                  parseInt(endMonth, 10) >= 4 &&
+                  parseInt(endMonth, 10) <= 12 &&
+                  language === "GE" ? (
+                  <>
+                    {startYear} წლის{" "}
+                    {parseInt(startYear, 10) >= 1988 &&
+                    parseInt(startYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(startMonth) + " "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    მანეთი მანეთის, კუპონის და ლარის ინფლაციის გათვალისწინებით{" "}
+                    {endYear} წლის{" "}
+                    {parseInt(endYear, 10) >= 1988 &&
+                    parseInt(endYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(endMonth) + " "}
+                    მდგომარეობით შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    ლარს.
+                  </>
+                ) : endYear === "1993" &&
+                  parseInt(endMonth, 10) >= 4 &&
+                  parseInt(endMonth, 10) <= 12 &&
+                  language === "GE" ? (
+                  <>
+                    {startYear} წლის{" "}
+                    {parseInt(startYear, 10) >= 1988 &&
+                    parseInt(startYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(startMonth) + " "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    მანეთი მანეთის და კუპონის ინფლაციის გათვალისწინებით{" "}
+                    {endYear} წლის{" "}
+                    {parseInt(endYear, 10) >= 1988 &&
+                    parseInt(endYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(endMonth) + " "}
+                    მდგომარეობით შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    კუპონს.
+                  </>
+                ) : ((parseInt(startYear, 10) === 1993 &&
+                    parseInt(startMonth, 10) >= 8) ||
+                    parseInt(startYear, 10) === 1994 ||
+                    (parseInt(startYear, 10) === 1995 &&
+                      parseInt(startMonth, 10) <= 9)) &&
+                  ((endYear === "1993" && parseInt(endMonth, 10) >= 8) ||
+                    endYear === "1994" ||
+                    (endYear === "1995" && parseInt(endMonth, 10) <= 9)) &&
+                  language === "GE" ? (
+                  <>
+                    {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    კუპონი კუპონის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                    {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    კუპონს.
+                  </>
+                ) : isCouponOnlyPeriod() ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      კუპონი კუპონის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                      {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      კუპონს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      coupon in {monthsEN[startMonth - 1]} {startYear}, taking
+                      into consideration coupon inflation, equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      coupon as of {monthsEN[endMonth - 1]} {endYear}.
+                    </>
+                  )
+                ) : startYear === "1995" &&
+                  startMonth === "1" &&
+                  endYear === "1995" &&
+                  parseInt(endMonth, 10) >= 10 &&
+                  parseInt(endMonth, 10) <= 12 ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      ლარი ლარის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                      {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      ლარს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      lari in {monthsEN[startMonth - 1]} {startYear}, taking
+                      into consideration lari inflation, equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        0
+                      </span>{" "}
+                      lari as of {monthsEN[endMonth - 1]} {endYear}.
+                    </>
+                  )
+                ) : isLariPeriod() ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის {monthsWithIs(startMonth)}{" "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      ლარი ლარის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                      {monthsWithIs(endMonth)} მდგომარეობით შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      ლარს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      lari in {monthsEN[startMonth - 1]} {startYear}, taking
+                      into consideration lari inflation, equals{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      lari as of {monthsEN[endMonth - 1]} {endYear}.
+                    </>
+                  )
+                ) : isManatPeriod() ? (
+                  language === "GE" ? (
+                    <>
+                      {startYear} წლის{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? ""
+                        : monthsWithIs(startMonth) + " "}
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      მანეთი მანეთის ინფლაციის გათვალისწინებით {endYear} წლის{" "}
+                      {parseInt(endYear, 10) >= 1988 &&
+                      parseInt(endYear, 10) <= 1990
+                        ? ""
+                        : monthsWithIs(endMonth) + " "}
+                      მდგომარეობით შეადგენს{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      მანეთს.
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                        {amount}
+                      </span>{" "}
+                      manat in{" "}
+                      {parseInt(startYear, 10) >= 1988 &&
+                      parseInt(startYear, 10) <= 1990
+                        ? startYear
+                        : `${monthsEN[startMonth - 1]} ${startYear}`}
+                      , taking into consideration inflation of Manet, is worth{" "}
+                      <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                        {computedAmount()}
+                      </span>{" "}
+                      manat as of{" "}
+                      {parseInt(endYear, 10) >= 1988 &&
+                      parseInt(endYear, 10) <= 1990
+                        ? endYear
+                        : `${monthsEN[endMonth - 1]} ${endYear}`}
+                      .
+                    </>
+                  )
+                ) : language === "GE" ? (
+                  <>
+                    {startYear} წლის{" "}
+                    {parseInt(startYear, 10) >= 1988 &&
+                    parseInt(startYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(startMonth) + " "}
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    {getCurrencyText(startYear)} ინფლაციის გათვალისწინებით{" "}
+                    {endYear} წლის{" "}
+                    {parseInt(endYear, 10) >= 1988 &&
+                    parseInt(endYear, 10) <= 1990
+                      ? ""
+                      : monthsWithIs(endMonth) + " "}
+                    მდგომარეობით შეადგენს{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    ლარს.
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontWeight: "bold", color: "#01389c" }}>
+                      {amount}
+                    </span>{" "}
+                    {getCurrencyTextEN(startYear)} in{" "}
+                    {parseInt(startYear, 10) >= 1988 &&
+                    parseInt(startYear, 10) <= 1990
+                      ? startYear
+                      : `${monthsEN[startMonth - 1]} ${startYear}`}
+                    , taking into consideration inflation of{" "}
+                    {getCurrencyTextEN(startYear)}, is worth{" "}
+                    <span style={{ fontWeight: "bold", color: "#EF1C31" }}>
+                      {computedAmount()}
+                    </span>{" "}
+                    {getCurrencyTextEN(endYear)} in{" "}
+                    {parseInt(endYear, 10) >= 1988 &&
+                    parseInt(endYear, 10) <= 1990
+                      ? endYear
+                      : `${monthsEN[endMonth - 1]} ${endYear}`}
+                    .
+                  </>
+                )}
               </p>
 
               {/* NOTE TEXT */}
